@@ -1,0 +1,102 @@
+---
+title: "Central Park Squirrels"
+output: 
+  html_document
+---
+
+## Dataset description and load
+This dataset comes from the 2018 Squirrel Census. According to their [website](https://www.thesquirrelcensus.com/about):
+
+> The Squirrel Census is a multimedia science, design, and storytelling project focusing on the Eastern gray (Sciurus carolinensis). We count squirrels and present our findings to the public. In October 2018, we tallied the squirrels in Central Park in New York, NY. This first phase of the Central Park Squirrel Census — the on-the-ground research and data-gathering conducted by the Squirrel Census Team and over 300 volunteers, with help from The Explorers Club, NYU Department of Environmental Studies, Macaulay Honors College, the Central Park Conservancy, and New York City Department of Parks & Recreation — was covered in a number of media outlets, including The New York Times, Popular Science, Now This, Atlas Obscura, and others. We presented our findings Thursday, June 20, 2019, at The Explorers Club in New York, NY. Additionally, we have performed two counts of Inman Park (Atlanta’s first suburban settlement, in 2012 and 2015), a number of satellite counts at other parks, and we’ve put on something called “Burning Squirrel."
+
+
+## Knit to HTML
+You can select the output format and options by clicking the gear icon and selecting Output Options. Keep the format as HTML, but try selecting one of the options in the "Apply Theme" dropdown. After clicking OK, you'll see that the option you chose has now been added to the YAML header of this Rmd document.
+
+Click the Knit yarn icon to run knitr and pandoc, producing and displaying an HTML version of this document. Try changing the theme and re-knitting, to see how the style of the output changes.
+
+
+## Load data
+This code chunk reads in the data csv. Modify this chunk so that it runs, but does not appear in the output report (and any warnings it generates do not appear in the output report).
+
+```{r}
+library(tidyverse)
+D = read.csv('2018_Central_Park_Squirrel_Census_-_Squirrel_Data.csv')
+```
+
+
+## Location plot
+The code plots the locations of all squirrel sightings, colored based on their fur color. Modify this chunk so that the plot appears in the report but the code does not.
+
+```{r}
+ggplot(data = D) + geom_point(mapping = aes(x = X, y = Y, color = Primary.Fur.Color), alpha=0.3, size=1)
+```
+
+
+## Caching
+This is a relatively slow chunk that looks for squirrels whose unique ID appears more than once in the dataset. Change this chunk so that its result gets cached and doesn't need to be recomputed on every knit, unless it has been changed.
+
+```{r}
+multipleSightings <- rep(FALSE, nrow(D))
+for (sq1 in 1:nrow(D)) {
+  if (sum(D[sq1,"Unique.Squirrel.ID"] == D[,"Unique.Squirrel.ID"]) > 1) {
+    multipleSightings[sq1] <- TRUE
+  }
+}
+```
+
+
+Now plot the locations of squirrels, showing which ones have multiple sightings. Make this chunk also be cached, and explicitly specify its dependence on the chunk above that calculates multipleSightings.
+
+```{r}
+```
+
+
+## Render from commandline
+Instead of using RStudio, we can call knit + pandoc from the command-line (which will be useful for creating a reproducible script to generate reports/manuscripts). Open a terminal window in this directory, and build the output file using the following command:
+```
+Rscript -e "library(rmarkdown); rmarkdown::render('squirrels.Rmd')"
+```
+
+
+## Shiny app
+We can also create interactive visualizations using a Shiny app. First, add the line "runtime: shiny" to the top of the document, inside the YAML header. Then remove the "eval=FALSE" option from the chunk below (this chunk had to be disabled to avoid errors during the previous non-shiny part of this exercise). After saving the file, you'll see the "knit" button change to "Run Document", indicating that it will create a Shiny server to display your output HTML.
+
+```{r, echo=FALSE, eval=FALSE}
+inputPanel(
+  selectInput("act", label = "Squirrel activity to plot:",
+              choices = c("Running","Chasing","Climbing","Eating","Foraging"),
+              selected = "Running")
+)
+
+renderPlot({
+  ggplot(data = D, aes(X,Y)) +
+    geom_point(aes_string(color = input$act), alpha=0.3, size=1)
+})
+```
+
+Create another Shiny plot that allows usings to map locations of the three different Squirrel sounds.
+
+```{r}
+
+```
+
+
+## Run from commandline
+You can also start up a Shiny server from the command line. In a terminal in this directory, run:
+```
+Rscript -e "library(rmarkdown); rmarkdown::run('squirrels.Rmd')"
+```
+It will give you a URL - copy and paste this into your browser, which will then trigger the rest of the build and produce the interactive HTML.
+
+Unlike in RStudio, running the server this way allows you to see updates to your output without having to manually trigger a new build. Try making a change to this Rmd file and saving it - you will see the page briefly gray out and then update to the changed version. You can kill the server in the terminal when done.
+
+
+## Share on shinyapps.io
+One way to share a shiny app with others is through RStudio's [shinyapps.io](https://www.shinyapps.io) service, which is free for up to 5 projects. Create an account, selecting the "using GitHub account" option. Then add your account as a publishing destination in RStudio in RStudio->Preferences->Publishing->Connect, and follow the instructions to copy your account token information.
+
+Now click "Run Document" and then, after the page loads, click "Publish" in the top-right. Make sure both the Rmd and data file are selected, and publish to your shinyapps account. It will take about a minute to deploy the app (largely installing the package dependencies), and then it will open in a browser window. This is a public webpage that can be shared with anyone, which is running an R instance on RStudio's servers to allow for interactive plots!
+
+
+## Commit to git
+Don't forget to add, commit, and push your changes to GitHub!
