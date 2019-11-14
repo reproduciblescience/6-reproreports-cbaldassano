@@ -1,0 +1,19 @@
+Package: Compendium title
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.1
+Authors@R: 
+    person(given = "C",
+           family = "B",
+           role = c("aut", "cre"),
+           email = "1@1.com")
+Description: Compendium description
+License: CC0
+Depends: 
+    dataRetrieval,
+    dplyr,
+    ggplot2,
+    lubridate,
+    tidyr,
+    viridis
+Encoding: UTF-8
+LazyData: true
